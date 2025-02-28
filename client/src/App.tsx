@@ -8,6 +8,7 @@ import Gateway from "@/pages/gateway";
 import Profile from "@/pages/profile";
 import Sidebar from "@/components/layout/sidebar"; // Added import for Sidebar
 import NotFound from "@/pages/not-found";
+import { AuthProvider, useAuth } from "@/lib/auth"; // Import AuthProvider and useAuth
 import "./lib/i18n";
 
 function ProtectedRoute({ component: Component, ...rest }: any) {
@@ -42,8 +43,10 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router />
-      <Toaster />
+      <AuthProvider>
+        <Router />
+        <Toaster />
+      </AuthProvider>
     </QueryClientProvider>
   );
 }

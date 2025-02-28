@@ -11,6 +11,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { useAuth } from "@/lib/auth"; // Added import for useAuth
+
 
 const schema = z.object({
   accessKey: z.string().min(1, "Access key is required"),
@@ -20,6 +22,7 @@ export default function Login() {
   const [_, setLocation] = useLocation();
   const { t } = useTranslation();
   const { toast } = useToast();
+  const auth = useAuth(); // Use the auth hook
 
   const form = useForm({
     resolver: zodResolver(schema),
@@ -34,6 +37,7 @@ export default function Login() {
       return res.json();
     },
     onSuccess: (data) => {
+      auth.login(data.id); // Use the auth hook to log in
       localStorage.setItem("userId", data.id.toString());
       setLocation("/dashboard");
     },
@@ -92,3 +96,18 @@ export default function Login() {
     </div>
   );
 }
+
+// Added basic useAuth implementation.  Replace with your actual authentication logic.
+export const useAuth = () => {
+  const [userId, setUserId] = React.useState<number | null>(null);
+
+  const login = (id: number) => {
+    setUserId(id);
+  };
+
+  const logout = () => {
+    setUserId(null);
+  };
+
+  return { userId, login, logout };
+};

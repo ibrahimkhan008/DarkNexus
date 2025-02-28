@@ -6,6 +6,8 @@ import GatewayCard from "@/components/gateway-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { type Gateway, type News } from "@shared/schema";
+import { Link } from "wouter"; // Added import for Link from wouter
+import Button from "@/components/ui/button"; // Assuming Button component exists
 
 export default function Dashboard() {
   const { t } = useTranslation();
@@ -40,7 +42,7 @@ export default function Dashboard() {
                     <AlertTitle>{item.title}</AlertTitle>
                     <AlertDescription>
                       {item.content.substring(0, 100)}
-                      {item.content.length > 100 && '...'}
+                      {item.content.length > 100 && "..."}
                     </AlertDescription>
                   </Alert>
                 ))}
