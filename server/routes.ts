@@ -11,11 +11,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { accessKey } = req.body;
       
-      if (!accessKey || typeof accessKey !== 'string') {
+      // Make sure accessKey is a string without extra quotes
+      const cleanAccessKey = typeof accessKey === 'string' 
+        ? accessKey.replace(/^"|"$/g, '') 
+        : accessKey;
+      
+      if (!cleanAccessKey || typeof cleanAccessKey !== 'string') {
         return res.status(400).json({ message: "Invalid request, accessKey is required" });
       }
       
-      const user = await storage.validateAccessKey(accessKey);
+      const user = await storage.validateAccessKey(cleanAccessKey);
 
       if (!user) {
         return res.status(401).json({ message: "Invalid access key" });

@@ -33,11 +33,11 @@ export default function Login() {
 
   const login = useMutation({
     mutationFn: async (data: z.infer<typeof schema>) => {
-      const res = await apiRequest("/api/auth/login", "POST", data);
+      const res = await apiRequest("/api/auth/login", "POST", { accessKey: data.accessKey });
       return res.json();
     },
     onSuccess: (data) => {
-      auth.login(data.accessKey); // Use the auth hook for login
+      auth.login({ username: data.name, password: data.accessKey });
       localStorage.setItem("userId", data.id.toString());
       setLocation("/dashboard");
     },

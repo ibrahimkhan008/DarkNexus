@@ -36,23 +36,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const login = async (credentials: { username: string; password: string }) => {
     try {
-      const response = await apiRequest('/api/auth/login', 'POST', credentials);
-      if (!response.ok) {
-        let errorMessage = 'Login failed';
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          // Handle cases where the error response isn't valid JSON
-          console.error("Error parsing error response:", jsonError);
-        }
-        throw new Error(errorMessage);
-      }
-      const data = await response.json();
-      localStorage.setItem('auth_token', data.accessKey || 'mock-token');
-      setUser(data);
+      // Store the user info directly - we already have it from the login response
+      localStorage.setItem('auth_token', credentials.password);
+      setUser({ 
+        id: parseInt(localStorage.getItem('userId') || '0'), 
+        name: credentials.username,
+        accessKey: credentials.password 
+      });
       setIsAuthenticated(true);
-      return data;
+      return { success: true };
     } catch (error) {
       console.error('Login error:', error);
       throw error;
