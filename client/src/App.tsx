@@ -60,9 +60,9 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
-import Login from "@/pages/login";
 import Gateway from "@/pages/gateway";
 import Profile from "@/pages/profile";
+import Dashboard from "@/pages/dashboard";
 
 // Import other necessary components
 
