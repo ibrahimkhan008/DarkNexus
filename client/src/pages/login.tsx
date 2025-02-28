@@ -97,17 +97,4 @@ export default function Login() {
   );
 }
 
-// Added basic useAuth implementation.  Replace with your actual authentication logic.
-export const useAuth = () => {
-  const [userId, setUserId] = React.useState<number | null>(null);
-
-  const login = (id: number) => {
-    setUserId(id);
-  };
-
-  const logout = () => {
-    setUserId(null);
-  };
-
-  return { userId, login, logout };
-};
+// Using the useAuth hook from lib/auth.tsx

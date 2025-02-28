@@ -6,8 +6,8 @@ import GatewayCard from "@/components/gateway-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { type Gateway, type News } from "@shared/schema";
-import { Link } from "wouter"; // Added import for Link from wouter
-import Button from "@/components/ui/button"; // Assuming Button component exists
+import { Link } from "wouter"; 
+import Button from "@/components/ui/button"; 
 
 export default function Dashboard() {
   const { t } = useTranslation();
