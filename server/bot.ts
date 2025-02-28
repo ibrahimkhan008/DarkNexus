@@ -48,7 +48,7 @@ export function startBot() {
       bot.sendMessage(chatId, "Unauthorized. Contact the administrator.");
       return;
     }
-    
+
     let commandsText = "Welcome to Nezuko Card Checker Admin Panel!\n\n" +
       "Commands:\n" +
       "/genkey - Generate new access key\n" +
@@ -57,14 +57,14 @@ export function startBot() {
       "/addgateway <name>|<endpoint> - Add gateway\n" +
       "/togglegateway <id> - Toggle gateway status\n" +
       "/addcredits <key> <amount> - Add credits to user";
-    
+
     // Add owner-only commands if the user is an owner
     if (OWNER_CHAT_IDS.includes(chatId)) {
       commandsText += "\n\n👑 Owner Commands:\n" +
         "/addadmin <chat_id> - Add new admin\n" +
         "/listadmins - List all admins";
     }
-    
+
     bot.sendMessage(chatId, commandsText);
   });
 
@@ -91,7 +91,7 @@ export function startBot() {
 
     const key = match[1];
     const success = await storage.revokeAccessKey(key);
-    
+
     bot.sendMessage(chatId, success 
       ? `Access key ${key} revoked successfully`
       : `Access key ${key} not found`
@@ -138,7 +138,7 @@ export function startBot() {
 
     const id = parseInt(match[1]);
     const success = await storage.toggleGateway(id);
-    
+
     bot.sendMessage(chatId, success 
       ? `Gateway ${id} status toggled successfully`
       : `Gateway ${id} not found`
@@ -153,7 +153,7 @@ export function startBot() {
 
     const [_, key, amount] = match;
     const credits = parseInt(amount);
-    
+
     const user = await storage.validateAccessKey(key);
     if (!user) {
       bot.sendMessage(chatId, "User not found");
@@ -167,33 +167,33 @@ export function startBot() {
   // Add admin (owner only)
   bot.onText(/\/addadmin (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
-    
+
     // Check if the requester is an owner
     if (!OWNER_CHAT_IDS.includes(chatId)) {
       bot.sendMessage(chatId, "This command is available to owners only");
       return;
     }
-    
+
     if (!match) return;
-    
+
     const newAdminId = parseInt(match[1]);
-    
+
     if (isNaN(newAdminId)) {
       bot.sendMessage(chatId, "Invalid chat ID format. Please provide a numeric ID");
       return;
     }
-    
+
     if (ADMIN_CHAT_IDS.includes(newAdminId)) {
       bot.sendMessage(chatId, "This user is already an admin");
       return;
     }
-    
+
     // Add the new admin
     ADMIN_CHAT_IDS.push(newAdminId);
     saveAdminIds();
-    
+
     bot.sendMessage(chatId, `Admin added successfully! Chat ID: ${newAdminId}`);
-    
+
     // Send welcome message to new admin
     try {
       await bot.sendMessage(
@@ -211,13 +211,13 @@ export function startBot() {
   // List all admins (owner only)
   bot.onText(/\/listadmins/, async (msg) => {
     const chatId = msg.chat.id;
-    
+
     // Check if the requester is an owner
     if (!OWNER_CHAT_IDS.includes(chatId)) {
       bot.sendMessage(chatId, "This command is available to owners only");
       return;
     }
-    
+
     const ownerTag = (id: number) => OWNER_CHAT_IDS.includes(id) ? " 👑" : "";
     const adminList = ADMIN_CHAT_IDS.map(id => `- ${id}${ownerTag(id)}`).join("\n");
     bot.sendMessage(chatId, `Current admins:\n${adminList}\n\n👑 = Owner`);

@@ -37,14 +37,15 @@ export default function Dashboard() {
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">Latest News</h2>
               <ScrollArea className="h-[200px]">
-                {news.slice(0, 1).map((item) => (
-                  <Alert key={item.id || item.title} className="mb-4">
-                    <AlertTitle>{item.title}</AlertTitle>
+                {/* Always display the first item which is now the latest news */}
+                {news.length > 0 && (
+                  <Alert key={news[0].id || news[0].title} className="mb-4">
+                    <AlertTitle>{news[0].title}</AlertTitle>
                     <AlertDescription>
-                      {item.content}
+                      {news[0].content}
                     </AlertDescription>
                   </Alert>
-                ))}
+                )}
               </ScrollArea>
             </div>
           )}

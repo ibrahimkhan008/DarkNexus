@@ -96,7 +96,12 @@ export class MemStorage implements IStorage {
   }
 
   async getNews(): Promise<News[]> {
-    return Array.from(this.news.values());
+    // Sort news by creation date in descending order (newest first)
+    return Array.from(this.news.values()).sort((a, b) => {
+      const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+      const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+      return dateB - dateA; // Descending order
+    });
   }
 
   async addNews(news: InsertNews): Promise<News> {
