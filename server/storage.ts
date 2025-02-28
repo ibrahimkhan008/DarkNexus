@@ -1,17 +1,22 @@
 import { users, news, gateways, type User, type News, type Gateway, type InsertUser, type InsertNews, type InsertGateway } from "@shared/schema";
 
 export interface IStorage {
+  // Existing methods
   validateAccessKey(key: string): Promise<User | undefined>;
   getUser(id: number): Promise<User | undefined>;
   updateUserCredits(id: number, credits: number): Promise<void>;
   updateUserProxy(id: number, proxy: Partial<User>): Promise<void>;
   updateUserLanguage(id: number, language: string): Promise<void>;
-  
   getNews(): Promise<News[]>;
   addNews(news: InsertNews): Promise<News>;
-  
   getGateways(): Promise<Gateway[]>;
   getGateway(id: number): Promise<Gateway | undefined>;
+
+  // New methods for bot operations
+  createUser(user: Partial<InsertUser>): Promise<User>;
+  revokeAccessKey(key: string): Promise<boolean>;
+  addGateway(gateway: InsertGateway): Promise<Gateway>;
+  toggleGateway(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -60,6 +65,7 @@ export class MemStorage implements IStorage {
     });
   }
 
+  // Existing methods
   async validateAccessKey(key: string): Promise<User | undefined> {
     return Array.from(this.users.values()).find(u => u.accessKey === key);
   }
@@ -106,6 +112,46 @@ export class MemStorage implements IStorage {
 
   async getGateway(id: number): Promise<Gateway | undefined> {
     return this.gateways.get(id);
+  }
+
+  // New methods for bot operations
+  async createUser(user: Partial<InsertUser>): Promise<User> {
+    const id = this.currentId.users++;
+    const newUser: User = {
+      id,
+      accessKey: user.accessKey!,
+      credits: user.credits || 0,
+      language: user.language || "en",
+      proxyHost: null,
+      proxyPort: null,
+      proxyUser: null,
+      proxyPass: null
+    };
+    this.users.set(id, newUser);
+    return newUser;
+  }
+
+  async revokeAccessKey(key: string): Promise<boolean> {
+    const user = await this.validateAccessKey(key);
+    if (!user) return false;
+    this.users.delete(user.id);
+    return true;
+  }
+
+  async addGateway(gateway: InsertGateway): Promise<Gateway> {
+    const id = this.currentId.gateways++;
+    const newGateway: Gateway = { ...gateway, id };
+    this.gateways.set(id, newGateway);
+    return newGateway;
+  }
+
+  async toggleGateway(id: number): Promise<boolean> {
+    const gateway = await this.getGateway(id);
+    if (!gateway) return false;
+
+    const updatedGateway = { ...gateway, active: !gateway.active };
+    this.gateways.set(id, updatedGateway);
+    return true;
   }
 }
 
