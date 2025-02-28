@@ -64,7 +64,7 @@ export default function Profile() {
 
   const updateLanguage = useMutation({
     mutationFn: async (language: string) => {
-      await apiRequest(`/api/user/${userId}/language`, "PATCH", { language });
+      return await apiRequest(`/api/user/${userId}/language`, "PATCH", { language });
     },
     onSuccess: (_, language) => {
       i18n.changeLanguage(language);
