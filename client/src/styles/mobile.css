@@ -1,0 +1,43 @@
+
+/* Mobile optimizations */
+@media (max-width: 768px) {
+  html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  input, select, textarea {
+    font-size: 16px !important; /* Prevents iOS zoom on focus */
+  }
+  
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  .mobile-full-width {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  
+  .mobile-hidden {
+    display: none !important;
+  }
+  
+  .mobile-stack {
+    flex-direction: column !important;
+  }
+  
+  .mobile-stack > * {
+    width: 100% !important;
+    margin-right: 0 !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .mobile-padding {
+    padding: 1rem !important;
+  }
+  
+  .mobile-small-text {
+    font-size: 0.875rem !important;
+  }
+}

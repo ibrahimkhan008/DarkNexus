@@ -2,8 +2,33 @@ import TelegramBot from "node-telegram-bot-api";
 import { nanoid } from "nanoid";
 import { storage } from "./storage";
 import type { InsertUser, InsertNews, InsertGateway } from "@shared/schema";
+import * as fs from "fs";
+import * as path from "path";
 
-const ADMIN_CHAT_IDS = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
+let ADMIN_CHAT_IDS = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
+const ADMIN_IDS_FILE = path.join(process.cwd(), "admin_ids.json");
+
+// Load admin IDs from file if it exists
+try {
+  if (fs.existsSync(ADMIN_IDS_FILE)) {
+    const fileData = fs.readFileSync(ADMIN_IDS_FILE, 'utf8');
+    const savedAdmins = JSON.parse(fileData);
+    // Merge saved admins with environment admins, removing duplicates
+    ADMIN_CHAT_IDS = [...new Set([...ADMIN_CHAT_IDS, ...savedAdmins])];
+  }
+} catch (error) {
+  console.error("Error loading admin IDs:", error);
+}
+
+// Save admin IDs to file
+const saveAdminIds = () => {
+  try {
+    fs.writeFileSync(ADMIN_IDS_FILE, JSON.stringify(ADMIN_CHAT_IDS), 'utf8');
+  } catch (error) {
+    console.error("Error saving admin IDs:", error);
+  }
+};
+
 const token = process.env.TELEGRAM_BOT_TOKEN || "";
 
 export function startBot() {
@@ -29,7 +54,8 @@ export function startBot() {
       "/addnews <title>|<content> - Add news\n" +
       "/addgateway <name>|<endpoint> - Add gateway\n" +
       "/togglegateway <id> - Toggle gateway status\n" +
-      "/addcredits <key> <amount> - Add credits to user"
+      "/addcredits <key> <amount> - Add credits to user\n" +
+      "/addadmin <chat_id> - Add new admin (Owner only)"
     );
   });
 
@@ -127,6 +153,66 @@ export function startBot() {
 
     await storage.updateUserCredits(user.id, user.credits + credits);
     bot.sendMessage(chatId, `Added ${credits} credits to user ${key}`);
+  });
+
+  // Add admin (owner only)
+  bot.onText(/\/addadmin (.+)/, async (msg, match) => {
+    const chatId = msg.chat.id;
+    
+    // Check if the requester is one of the original admins from env var
+    const originalAdmins = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
+    if (!originalAdmins.includes(chatId)) {
+      bot.sendMessage(chatId, "This command is available to owners only");
+      return;
+    }
+    
+    if (!match) return;
+    
+    const newAdminId = parseInt(match[1]);
+    
+    if (isNaN(newAdminId)) {
+      bot.sendMessage(chatId, "Invalid chat ID format. Please provide a numeric ID");
+      return;
+    }
+    
+    if (ADMIN_CHAT_IDS.includes(newAdminId)) {
+      bot.sendMessage(chatId, "This user is already an admin");
+      return;
+    }
+    
+    // Add the new admin
+    ADMIN_CHAT_IDS.push(newAdminId);
+    saveAdminIds();
+    
+    bot.sendMessage(chatId, `Admin added successfully! Chat ID: ${newAdminId}`);
+    
+    // Send welcome message to new admin
+    try {
+      await bot.sendMessage(
+        newAdminId,
+        "You have been added as an admin to the Nezuko Card Checker Admin Panel. Use /start to see available commands."
+      );
+    } catch (error) {
+      bot.sendMessage(
+        chatId,
+        "Admin added, but failed to send welcome message. The bot may need to be started by the new admin first."
+      );
+    }
+  });
+
+  // List all admins (owner only)
+  bot.onText(/\/listadmins/, async (msg) => {
+    const chatId = msg.chat.id;
+    
+    // Check if the requester is one of the original admins from env var
+    const originalAdmins = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
+    if (!originalAdmins.includes(chatId)) {
+      bot.sendMessage(chatId, "This command is available to owners only");
+      return;
+    }
+    
+    const adminList = ADMIN_CHAT_IDS.map(id => `- ${id}`).join("\n");
+    bot.sendMessage(chatId, `Current admins:\n${adminList}`);
   });
 
   console.log("Telegram bot started!");
