@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import { apiRequest } from './queryClient';
 
@@ -18,24 +17,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<any>(null);
 
   useEffect(() => {
-    // Check if user is logged in on mount
     const checkAuth = async () => {
       try {
-        // Check local storage for auth token
         const token = localStorage.getItem('auth_token');
         if (token) {
-          // Verify token with server if needed
-          // const response = await apiRequest('/api/auth/verify', 'GET');
-          // if (response.ok) {
-          //   const userData = await response.json();
-          //   setUser(userData);
-          //   setIsAuthenticated(true);
-          // }
-          
-          // For now, just assume token means authenticated
           setIsAuthenticated(true);
-          
-          // Mock user data
           setUser({ id: 1, name: "User" });
         }
       } catch (error) {
@@ -51,16 +37,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const login = async (credentials: { username: string; password: string }) => {
     try {
       const response = await apiRequest('/api/auth/login', 'POST', credentials);
-      const data = await response.json();
-      
-      if (response.ok) {
-        localStorage.setItem('auth_token', data.accessKey || 'mock-token');
-        setUser(data);
-        setIsAuthenticated(true);
-        return data;
-      } else {
-        throw new Error(data.message || 'Login failed');
+      if (!response.ok) {
+        let errorMessage = 'Login failed';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          // Handle cases where the error response isn't valid JSON
+          console.error("Error parsing error response:", jsonError);
+        }
+        throw new Error(errorMessage);
       }
+      const data = await response.json();
+      localStorage.setItem('auth_token', data.accessKey || 'mock-token');
+      setUser(data);
+      setIsAuthenticated(true);
+      return data;
     } catch (error) {
       console.error('Login error:', error);
       throw error;

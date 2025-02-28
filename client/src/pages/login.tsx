@@ -37,11 +37,12 @@ export default function Login() {
       return res.json();
     },
     onSuccess: (data) => {
-      auth.login(data.id); // Use the auth hook to log in
+      auth.login(data.accessKey); // Use the auth hook for login
       localStorage.setItem("userId", data.id.toString());
       setLocation("/dashboard");
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Login error:", error);
       toast({
         title: "Error",
         description: "Invalid access key",
