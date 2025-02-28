@@ -27,7 +27,7 @@ export default function Sidebar() {
       <nav className="mt-6">
         {navItems.map((item) => (
           <Link key={item.href} href={item.href}>
-            <a
+            <div
               className={cn(
                 "flex items-center gap-3 px-6 py-3 text-sidebar-foreground hover:bg-sidebar-accent transition-colors",
                 location === item.href && "bg-sidebar-accent text-primary"
@@ -35,7 +35,7 @@ export default function Sidebar() {
             >
               <item.icon className="h-5 w-5" />
               {item.label}
-            </a>
+            </div>
           </Link>
         ))}
       </nav>
