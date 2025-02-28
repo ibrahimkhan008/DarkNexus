@@ -55,3 +55,49 @@ function App() {
 }
 
 export default App;
+import { Route, Switch } from "wouter";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "@/lib/queryClient";
+import { Toaster } from "@/components/ui/toaster";
+import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import Dashboard from "@/pages/dashboard";
+import Login from "@/pages/login";
+import Gateway from "@/pages/gateway";
+import Profile from "@/pages/profile";
+
+// Import other necessary components
+
+function ProtectedRoute({ component: Component, ...rest }: any) {
+  const { isAuthenticated } = useAuth();
+  
+  if (!isAuthenticated) {
+    return <Route path="/login" />;
+  }
+  
+  return <Component {...rest} />;
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AuthProvider>
+        <Toaster />
+        <Switch>
+          <Route path="/login" component={Login} />
+          <Route path="/dashboard">
+            {() => <ProtectedRoute component={Dashboard} />}
+          </Route>
+          <Route path="/gateway/:id">
+            {(params) => <ProtectedRoute component={Gateway} params={params} />}
+          </Route>
+          <Route path="/profile">
+            {() => <ProtectedRoute component={Profile} />}
+          </Route>
+          <Route path="/">
+            {() => <ProtectedRoute component={Dashboard} />}
+          </Route>
+        </Switch>
+      </AuthProvider>
+    </QueryClientProvider>
+  );
+}

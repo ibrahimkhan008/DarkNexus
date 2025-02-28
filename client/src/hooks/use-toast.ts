@@ -189,3 +189,37 @@ function useToast() {
 }
 
 export { useToast, toast }
+import { Toast, ToastActionElement, ToastProps } from "@/components/ui/toast";
+import {
+  toast as sonnerToast,
+  ToastOptions as SonnerToastOptions,
+} from "@/components/ui/toast";
+
+type ToastOptions = SonnerToastOptions & {
+  variant?: "default" | "destructive" | "success";
+  title?: string;
+  description?: string;
+  action?: ToastActionElement;
+};
+
+export function useToast() {
+  function toast({
+    variant = "default",
+    title,
+    description,
+    action,
+    ...props
+  }: ToastOptions) {
+    sonnerToast({
+      variant,
+      title,
+      description,
+      action,
+      ...props,
+    });
+  }
+
+  return {
+    toast,
+  };
+}
