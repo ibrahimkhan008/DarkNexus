@@ -7,7 +7,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import { type Gateway, type News } from "@shared/schema";
 import { Link } from "wouter"; 
-import Button from "@/components/ui/button"; 
+import { Button } from "@/components/ui/button"; 
 
 export default function Dashboard() {
   const { t } = useTranslation();
