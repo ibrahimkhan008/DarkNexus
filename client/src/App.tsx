@@ -6,10 +6,12 @@ import Login from "@/pages/login";
 import Dashboard from "@/pages/dashboard";
 import Gateway from "@/pages/gateway";
 import Profile from "@/pages/profile";
-import Sidebar from "@/components/layout/sidebar"; // Added import for Sidebar
+import Sidebar from "@/components/layout/sidebar";
 import NotFound from "@/pages/not-found";
-import { AuthProvider, useAuth } from "@/lib/auth"; // Import AuthProvider and useAuth
+import { AuthProvider, useAuth } from "@/lib/auth";
 import "./lib/i18n";
+import NewsPage from "@/pages/news"; // Added import for NewsPage
+
 
 function ProtectedRoute({ component: Component, ...rest }: any) {
   const { isAuthenticated, loading } = useAuth();
@@ -35,6 +37,7 @@ function Router() {
       <Route path="/dashboard" component={()=> <ProtectedRoute component={Dashboard} />} />
       <Route path="/gateway/:id" component={()=> <ProtectedRoute component={Gateway} />} />
       <Route path="/profile" component={()=> <ProtectedRoute component={Profile} />} />
+      <Route path="/news" component={()=> <ProtectedRoute component={NewsPage} />} /> {/* Added News route */}
       <Route component={NotFound} />
     </Switch>
   );

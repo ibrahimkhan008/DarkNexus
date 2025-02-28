@@ -37,24 +37,14 @@ export default function Dashboard() {
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">Latest News</h2>
               <ScrollArea className="h-[200px]">
-                {news.slice(0, 2).map((item) => (
+                {news.slice(0, 1).map((item) => (
                   <Alert key={item.id || item.title} className="mb-4">
                     <AlertTitle>{item.title}</AlertTitle>
                     <AlertDescription>
-                      {item.content.substring(0, 100)}
-                      {item.content.length > 100 && "..."}
+                      {item.content}
                     </AlertDescription>
                   </Alert>
                 ))}
-                {news.length > 2 && (
-                  <div className="text-center">
-                    <Link href="#" onClick={() => document.querySelector('button:has(.lucide-bell)')?.click()}>
-                      <Button variant="outline" size="sm">
-                        View All News
-                      </Button>
-                    </Link>
-                  </div>
-                )}
               </ScrollArea>
             </div>
           )}
