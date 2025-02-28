@@ -8,8 +8,8 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
-  method: string = "GET", // Default to GET if method is not provided
   url: string,
+  method: string = "GET", // Default to GET if method is not provided
   data?: unknown | undefined,
 ): Promise<Response> {
   const res = await fetch(url, {
