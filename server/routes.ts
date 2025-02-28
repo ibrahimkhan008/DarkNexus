@@ -57,25 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // News routes
   app.get("/api/news", async (req, res) => {
     try {
-      // Mock news data
-      const news = [
-        {
-          title: "Braintree Update",
-          content: "Braintree API has been upgraded to v2.0 with enhanced fraud detection capabilities. All merchants are encouraged to update their integration by the end of the month."
-        },
-        {
-          title: "New Payment Method",
-          content: "We've added support for Apple Pay! Integrate this popular payment method to improve your conversion rates on iOS devices. Check the documentation for implementation details."
-        },
-        {
-          title: "Maintenance Notice",
-          content: "Scheduled maintenance will take place on July 15th from 2:00 AM to 4:00 AM UTC. During this time, the test environment will be unavailable, but production services will not be affected."
-        },
-        {
-          title: "Security Enhancement",
-          content: "We've implemented additional security measures to protect against card testing attacks. These changes are automatically applied to all merchants and require no action on your part."
-        }
-      ];
+      const news = await storage.getNews();
       res.json(news);
     } catch (error) {
       res.status(500).json({ message: "Error fetching news", error });
