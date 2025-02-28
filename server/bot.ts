@@ -29,6 +29,9 @@ const saveAdminIds = () => {
   }
 };
 
+// Define owner IDs (original admins from environment variables)
+const OWNER_CHAT_IDS = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
+
 const token = process.env.TELEGRAM_BOT_TOKEN || "";
 
 export function startBot() {
@@ -46,17 +49,23 @@ export function startBot() {
       return;
     }
     
-    bot.sendMessage(chatId, 
-      "Welcome to Nezuko Card Checker Admin Panel!\n\n" +
+    let commandsText = "Welcome to Nezuko Card Checker Admin Panel!\n\n" +
       "Commands:\n" +
       "/genkey - Generate new access key\n" +
       "/revoke <key> - Revoke access key\n" +
       "/addnews <title>|<content> - Add news\n" +
       "/addgateway <name>|<endpoint> - Add gateway\n" +
       "/togglegateway <id> - Toggle gateway status\n" +
-      "/addcredits <key> <amount> - Add credits to user\n" +
-      "/addadmin <chat_id> - Add new admin (Owner only)"
-    );
+      "/addcredits <key> <amount> - Add credits to user";
+    
+    // Add owner-only commands if the user is an owner
+    if (OWNER_CHAT_IDS.includes(chatId)) {
+      commandsText += "\n\n👑 Owner Commands:\n" +
+        "/addadmin <chat_id> - Add new admin\n" +
+        "/listadmins - List all admins";
+    }
+    
+    bot.sendMessage(chatId, commandsText);
   });
 
   // Generate access key
@@ -159,9 +168,8 @@ export function startBot() {
   bot.onText(/\/addadmin (.+)/, async (msg, match) => {
     const chatId = msg.chat.id;
     
-    // Check if the requester is one of the original admins from env var
-    const originalAdmins = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
-    if (!originalAdmins.includes(chatId)) {
+    // Check if the requester is an owner
+    if (!OWNER_CHAT_IDS.includes(chatId)) {
       bot.sendMessage(chatId, "This command is available to owners only");
       return;
     }
@@ -204,15 +212,15 @@ export function startBot() {
   bot.onText(/\/listadmins/, async (msg) => {
     const chatId = msg.chat.id;
     
-    // Check if the requester is one of the original admins from env var
-    const originalAdmins = process.env.ADMIN_CHAT_IDS?.split(",").map(Number) || [];
-    if (!originalAdmins.includes(chatId)) {
+    // Check if the requester is an owner
+    if (!OWNER_CHAT_IDS.includes(chatId)) {
       bot.sendMessage(chatId, "This command is available to owners only");
       return;
     }
     
-    const adminList = ADMIN_CHAT_IDS.map(id => `- ${id}`).join("\n");
-    bot.sendMessage(chatId, `Current admins:\n${adminList}`);
+    const ownerTag = (id: number) => OWNER_CHAT_IDS.includes(id) ? " 👑" : "";
+    const adminList = ADMIN_CHAT_IDS.map(id => `- ${id}${ownerTag(id)}`).join("\n");
+    bot.sendMessage(chatId, `Current admins:\n${adminList}\n\n👑 = Owner`);
   });
 
   console.log("Telegram bot started!");
