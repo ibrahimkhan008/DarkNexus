@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import { Link } from "wouter";
 import Sidebar from "@/components/layout/sidebar";
 import GatewayCard from "@/components/gateway-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -14,6 +15,7 @@ export default function Dashboard() {
 
   const { data: gateways } = useQuery<Gateway[]>({
     queryKey: ["/api/gateways"],
+    refetchOnWindowFocus: true,
   });
 
   const { data: news } = useQuery<News[]>({
@@ -59,10 +61,14 @@ export default function Dashboard() {
             </div>
           )}
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {gateways?.map((gateway, index) => (
-              <GatewayCard key={gateway.id} gateway={gateway} index={index} />
-            ))}
+          {/* Gateways Section */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold mb-4">Gateways</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {gateways?.map((gateway, index) => (
+                <GatewayCard key={gateway.id} gateway={gateway} index={index} />
+              ))}
+            </div>
           </div>
         </motion.div>
       </main>
