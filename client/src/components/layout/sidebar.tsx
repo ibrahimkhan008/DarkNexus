@@ -41,14 +41,12 @@ export default function Sidebar() {
       </nav>
 
       <div className="absolute bottom-6 px-6 text-xs text-sidebar-foreground/60">
-        <a
-          href="https://t.me/NezukoChk0wner"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hover:text-primary transition-colors"
+        <span
+          onClick={() => window.open("https://t.me/NezukoChk0wner", "_blank")}
+          className="hover:text-primary transition-colors cursor-pointer"
         >
           Crafted by Nezuko
-        </a>
+        </span>
       </div>
     </motion.div>
   );
