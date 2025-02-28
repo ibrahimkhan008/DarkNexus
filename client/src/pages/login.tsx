@@ -30,7 +30,7 @@ export default function Login() {
 
   const login = useMutation({
     mutationFn: async (data: z.infer<typeof schema>) => {
-      const res = await apiRequest("POST", "/api/auth/login", data);
+      const res = await apiRequest("/api/auth/login", "POST", data);
       return res.json();
     },
     onSuccess: (data) => {
