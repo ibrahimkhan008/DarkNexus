@@ -10,7 +10,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/auth/login", async (req, res) => {
     const { accessKey } = req.body;
     const user = await storage.validateAccessKey(accessKey);
-    
+
     if (!user) {
       return res.status(401).json({ message: "Invalid access key" });
     }
@@ -40,9 +40,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // News routes
-  app.get("/api/news", async (_req, res) => {
-    const news = await storage.getNews();
-    res.json(news);
+  app.get("/api/news", async (req, res) => {
+    try {
+      // Mock news data
+      const news = [
+        {
+          title: "Braintree Update",
+          content: "Braintree API has been upgraded to v2.0 with enhanced fraud detection capabilities. All merchants are encouraged to update their integration by the end of the month."
+        },
+        {
+          title: "New Payment Method",
+          content: "We've added support for Apple Pay! Integrate this popular payment method to improve your conversion rates on iOS devices. Check the documentation for implementation details."
+        },
+        {
+          title: "Maintenance Notice",
+          content: "Scheduled maintenance will take place on July 15th from 2:00 AM to 4:00 AM UTC. During this time, the test environment will be unavailable, but production services will not be affected."
+        },
+        {
+          title: "Security Enhancement",
+          content: "We've implemented additional security measures to protect against card testing attacks. These changes are automatically applied to all merchants and require no action on your part."
+        }
+      ];
+      res.json(news);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching news", error });
+    }
   });
 
   // Gateway routes
@@ -55,7 +77,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/gateways/:gateway/check", async (req, res) => {
     const { card } = req.body;
     const userId = parseInt(req.query.userId as string);
-    
+
     const user = await storage.getUser(userId);
     if (!user || user.credits < 1) {
       return res.status(402).json({ message: "Insufficient credits" });

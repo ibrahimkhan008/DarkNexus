@@ -35,13 +35,34 @@ export default function Dashboard() {
             <div className="mb-8">
               <h2 className="text-xl font-semibold mb-4">Latest News</h2>
               <ScrollArea className="h-[200px]">
-                {news.map((item) => (
-                  <Alert key={item.id} className="mb-4">
+                {news.slice(0, 2).map((item) => (
+                  <Alert key={item.id || item.title} className="mb-4">
                     <AlertTitle>{item.title}</AlertTitle>
-                    <AlertDescription>{item.content}</AlertDescription>
+                    <AlertDescription>
+                      {item.content.substring(0, 100)}
+                      {item.content.length > 100 && '...'}
+                    </AlertDescription>
                   </Alert>
                 ))}
+                {news.length > 2 && (
+                  <div className="text-center">
+                    <Link href="#" onClick={() => document.querySelector('button:has(.lucide-bell)')?.click()}>
+                      <Button variant="outline" size="sm">
+                        View All News
+                      </Button>
+                    </Link>
+                  </div>
+                )}
               </ScrollArea>
+            </div>
+          )}
+
+          {(!news || news.length === 0) && (
+            <div className="mb-8">
+              <Alert>
+                <AlertTitle>No Latest News</AlertTitle>
+                <AlertDescription>There are currently no news items to display.</AlertDescription>
+              </Alert>
             </div>
           )}
 
